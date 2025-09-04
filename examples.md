@@ -36,3 +36,12 @@ python /longmore/scott_storage/vscode/dump_sanitiser/cli.py \
     --log-file /mnt/disks/Jenny_Disk/Misc_Brown_BU/Brown_WD_HDD_sanitise.log \
     --log-level DEBUG
 ```
+
+```
+python /longmore/scott_storage/vscode/dump_sanitiser/cli.py \
+    --dump_path /mnt/disks/Jenny_Disk/Misc_Brown_BU/Alan_PC_Data \
+    --extract_media_files_to /mnt/disks/Jenny_Disk/Misc_Brown_BU/Alan_PC_Data_MIME_files \
+    --make_dest_ok \
+    --log-file /mnt/disks/Jenny_Disk/Misc_Brown_BU/Alan_PC_Data_sanitise.log \
+    --log-level DEBUG
+```

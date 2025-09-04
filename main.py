@@ -4,6 +4,8 @@
 import logging
 import os
 from pathlib import Path
+import shutil
+from typing import Generator
 
 from constants import COMMON_JUNK_FILENAMES, SYSTEM_JUNK_FILES
 from constants import COMMON_MIME_TYPES_MOZILLA
@@ -15,9 +17,16 @@ DEFAULT_EXCLUDE_DIRS = EXCLUDE_DIRS_WINDOWS_COMMON
 
 logger = logging.getLogger(__name__)
 
-def scantree(path):
+def scantree(path, yield_dirs=False) -> Generator[os.DirEntry[str], None, None]:
     """Recursively yield DirEntry objects for files (only) within the
     directory specified by `path`.
+
+    Parameters
+    ----------
+    path : str or Path
+        The root directory to scan.
+    yield_dirs : bool, optional
+        If True, also yield directory entries (not just files).
 
     Notes
     -----
@@ -25,7 +34,9 @@ def scantree(path):
     """
     for entry in os.scandir(path):
         if entry.is_dir(follow_symlinks=False):
-            yield from scantree(entry.path)
+            if yield_dirs:
+                yield entry
+            yield from scantree(entry.path, yield_dirs=yield_dirs)
         else:
             yield entry
 
@@ -128,14 +139,29 @@ def _delete_common_junk_files(
             logger.info(f"Deleting junk file: {entry.path}")
             os.remove(entry.path)
 
+def _delete_windows_directories(
+        root_path: Path
+        ) -> None:
+    """Find any `WINDOWS` directories (confirming any matches also
+    contain a `system32` sub-directory) within `root_path`, and delete
+    these.
+    """
+    for entry in scantree(root_path, yield_dirs=True):
+        if entry.name == "WINDOWS" and entry.is_dir():
+            system32_dir = Path(entry) / "system32"
+            if system32_dir.is_dir():
+                logger.info(f"Deleting Windows directory: {entry.path}")
+                shutil.rmtree(entry.path)
+
 def sanitise_dump_directory(
         dump_path: Path,
         extract_media_files_to: Path,
         media_file_extensions: set[str] | None = None,
         exclude_dirs: set[Path] | None = None,
-        remove_common_junk_files: bool = True,
-        remove_system_junk_files: bool = True,
-        remove_empty_dirs: bool = True,
+        remove_common_junk_files: bool = False,
+        remove_system_junk_files: bool = False,
+        remove_windows_dirs: bool = False,
+        remove_empty_dirs: bool = False,
         ) -> None:
     """
     Sanitize the specified dump directory by removing unwanted files and
@@ -162,17 +188,20 @@ def sanitise_dump_directory(
     remove_system_junk_files : bool, default=True
         Toggle whether to remove system junk files (e.g. pagefile.sys)
         from the dump directory.
+    remove_windows_dirs : bool, default=True
+        Toggle whether to remove Windows directories (e.g. C:\WINDOWS)
+        from the dump directory.
     remove_empty_dirs : bool, default=True
         Toggle whether to remove empty directories after sanitizing the
         dump directory.
     """
-    # Run media file extraction
-    _extract_media_files(
-        source_path=dump_path,
-        dest_path=extract_media_files_to,
-        extensions=media_file_extensions,
-        exclude_dirs=exclude_dirs,
-    )
+
+    # Remove WINDOWS directories
+    if remove_windows_dirs:
+        logger.info("Removing Windows directories...")
+        _delete_windows_directories(
+            root_path=dump_path
+        )
 
     # Remove common junk files
     if remove_common_junk_files:
@@ -190,6 +219,13 @@ def sanitise_dump_directory(
             junk_filenames=SYSTEM_JUNK_FILES
         )
 
+    # Run media file extraction
+    _extract_media_files(
+        source_path=dump_path,
+        dest_path=extract_media_files_to,
+        extensions=media_file_extensions,
+        exclude_dirs=exclude_dirs,
+    )
 
     # Remove empty directories
     if remove_empty_dirs:

@@ -39,6 +39,12 @@ if __name__ == "__main__":
         help="Whether to remove system junk files (e.g. pagefile.sys) "
              "from the dump directory.")
     parser.add_argument(
+        "--remove_windows_dirs",
+        action="store_true",
+        default=True,
+        help="Whether to remove Windows directories (e.g. C:\\WINDOWS) "
+             "from the dump directory.")
+    parser.add_argument(
         "--remove_empty_dirs", "-r",
         action="store_true",
         default=True,
@@ -104,6 +110,9 @@ if __name__ == "__main__":
         extract_media_files_to=args.extract_media_files_to,
         media_file_extensions=set(args.extensions) if args.extensions else None,
         exclude_dirs=set(args.exclude_dirs) if args.exclude_dirs else None,
+        remove_common_junk_files=args.remove_common_junk_files,
+        remove_system_junk_files=args.remove_system_junk_files,
+        remove_windows_dirs=args.remove_windows_dirs,
         remove_empty_dirs=args.remove_empty_dirs
     )
     
