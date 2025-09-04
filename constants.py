@@ -1,0 +1,105 @@
+
+
+from pathlib import Path
+
+COMMON_MIME_TYPES_MOZILLA = {
+    ".aac",
+    ".abw",
+    ".apng",
+    ".arc",
+    ".avif",
+    ".avi",
+    ".azw",
+    ".bin",
+    ".bmp",
+    ".bz",
+    ".bz2",
+    ".cda",
+    ".csh",
+    ".css",
+    ".csv",
+    ".doc",
+    ".docx",
+    ".eot",
+    ".epub",
+    ".gz",
+    ".gif",
+    ".htm",
+    ".html",
+    ".ico",
+    ".ics",
+    ".jar",
+    ".jpeg",
+    ".jpg",
+    ".js",
+    ".json",
+    ".jsonld",
+    ".md",
+    ".mid",
+    ".midi",
+    ".mjs",
+    ".mp3",
+    ".mp4",
+    ".mpeg",
+    ".mpkg",
+    ".odp",
+    ".ods",
+    ".odt",
+    ".oga",
+    ".ogv",
+    ".ogx",
+    ".opus",
+    ".otf",
+    ".png",
+    ".pdf",
+    ".php",
+    ".ppt",
+    ".pptx",
+    ".rar",
+    ".rtf",
+    ".sh",
+    ".svg",
+    ".tar",
+    ".tif",
+    ".tiff",
+    ".ts",
+    ".ttf",
+    ".txt",
+    ".vsd",
+    ".wav",
+    ".weba",
+    ".webm",
+    ".webmanifest",
+    ".webp",
+    ".woff",
+    ".woff2",
+    ".xhtml",
+    ".xls",
+    ".xlsx",
+    ".xml",
+    ".xul",
+    ".zip",
+    ".3gp",
+    ".3g2",
+    ".7z",
+}
+"""Common MIME types per Mozilla; source:
+`https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types/Common_types`
+"""
+
+EXCLUDE_DIRS_WINDOWS_COMMON = {
+    Path("Program Files"),
+    Path("Program Files (x86)"),
+    Path("Windows"),
+}
+
+COMMON_JUNK_FILENAMES = {
+    "Thumbs.db",
+    ".DS_Store",
+    "desktop.ini",
+    "._.Trashes"
+}
+
+SYSTEM_JUNK_FILES = {
+    "pagefile.sys"
+}
