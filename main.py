@@ -146,12 +146,17 @@ def _delete_windows_directories(
     contain a `system32` sub-directory) within `root_path`, and delete
     these.
     """
+    dirs_to_delete = []
     for entry in scantree(root_path, yield_dirs=True):
         if entry.name == "WINDOWS" and entry.is_dir():
             system32_dir = Path(entry) / "system32"
             if system32_dir.is_dir():
-                logger.info(f"Deleting Windows directory: {entry.path}")
-                shutil.rmtree(entry.path)
+                logger.debug(f"Found Windows directory: {entry.path}")
+                dirs_to_delete.append(entry)
+
+    for dir_to_delete in dirs_to_delete:
+        logger.info(f"Deleting Windows directory: {dir_to_delete.path}")
+        shutil.rmtree(dir_to_delete.path)
 
 def sanitise_dump_directory(
         dump_path: Path,
